@@ -1,14 +1,17 @@
 require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require('cors');
 const {createTodo, updateTodo} = require('./type.js');
 const {todo} = require('./db.js');
+
+const app = express();
+app.use(express.json());
+app.use(cors());
 
 const PORT = 8080;
 const MONGO_URL = process.env.MONGO_URL;
 
-const app = express();
-app.use(express.json());
 
 app.post("/todo", async(req, res)=>{
     const createPayload = req.body;
