@@ -1,10 +1,14 @@
 const express = require("express");
-import {createTodo, updateTodo} from './type'
+import {createTodo, updateTodo} from './type.js'
+import {todo} from './db.js'
+
+const PORT = 8080;
+const MONGO_URL = process.env.MONGO_URL;
 
 const app = express();
 app.use(express.json());
 
-app.post("/todo", (req, res)=>{
+app.post("/todo", async(req, res)=>{
     const createPayload = req.body;
     const parsedPayload = createTodo.safeParse(createPayload);
     if(!parsedPayload.success){
@@ -13,13 +17,25 @@ app.post("/todo", (req, res)=>{
         })
         return;
     }
+    await todo.create({
+        title : createPayload.title,
+        description  : createPayload.description,
+        complete : false
+    })
+    res.json({
+        msg : "TODO created"
+    })
 });
 
-app.get("/todos", (req, res)=>{
-
+app.get("/todos", async(req, res)=>{
+    const todos = await todo.find({});
+    console.log(todos);
+    res.json({
+        todo
+    })
 });
 
-app.put("/completed", (req, res)=>{
+app.put("/completed", async(req, res)=>{
     const updatePayload = req.body;
     const parsedPayload = updateTodo.safeParse(updatePayload);
     if(!parsedPayload.success){
@@ -28,7 +44,19 @@ app.put("/completed", (req, res)=>{
         })
         return;
     }
-
+    await todo.update({
+        _id: req.body._id
+    },{
+        complete : true 
+    })
+    req.json({
+        msg:"todo marked as completed"
+    })
 });
 
-const port = 8080;
+
+app.listen(PORT, ()=>{
+    console.log(`backend is working at port ${PORT}`);
+    mongoose.connect(MONGO_URL);
+    console.log("Database Connected!!");
+})
