@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require("express");
-import {createTodo, updateTodo} from './type.js'
-import {todo} from './db.js'
+const mongoose = require("mongoose");
+const {createTodo, updateTodo} = require('./type.js');
+const {todo} = require('./db.js');
 
 const PORT = 8080;
 const MONGO_URL = process.env.MONGO_URL;
@@ -31,7 +33,7 @@ app.get("/todos", async(req, res)=>{
     const todos = await todo.find({});
     console.log(todos);
     res.json({
-        todo
+        todos
     })
 });
 
